@@ -15,3 +15,18 @@ dotnet ef --version   # 10.0.9
 docker --version      # 29.5.2
 ```
 
+### Migrations
+
+Migrations are code-controlled, reversible descriptions of a schema change. Each migration contains an Up() and Down() function performing the actions of `applying` and `rolling back` the migration respectively. Migrations should live in source control and gives you a complete audit trail of schema changes over time. They also allow for easier sharing of db migrations between members on a team.
+
+Creating a migration from a DB Context file:
+
+```bash
+dotnet ef migrations add InitialSchema --project OrbitalWatch.Api
+```
+
+Update database schema after a new migration has been made within a project:
+
+```bash
+dotnet ef database update --project OrbitalWatch.Api
+```
