@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OrbitalWatch.Api.Data;
+using OrbitalWatch.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OrbitalWatchDbContext>(options =>
   options.UseSqlite(builder.Configuration.GetConnectionString("Default")
     ?? "Data Source=orbital_watch.db"));
+
+builder.Services.AddScoped<ISatelliteRepository, SatelliteRepository>(); // AddScoped creates one instance per HTTP request, which is required instead of AddSingleton as EF is not thread safe
 
 var app = builder.Build();
 
