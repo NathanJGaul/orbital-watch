@@ -3,6 +3,34 @@
 > 
 > a full-stack app (React + .NET Core API) streaming mock satellite state vectors via SignalR, with SQL Server schema, Redis cache, and a Three.js ground track.
 
+## Quick Setup and Run
+
+```bash
+# Clone the repository
+git clone https://github.com/NathanJGaul/orbital-watch.git
+cd orbital-watch
+
+# Initialize the database schema
+dotnet ef migrations add InitialSchema --project OrbitalWatch.Api
+dotnet ef database update --project OrbitalWatch.Api
+
+# Run web api
+cd OrbitalWatch.Api/
+dotnet run
+
+# Test web api
+curl http://localhost:5164/api/satellites | jq . # returns all satellites
+curl http://localhost:5164/api/satellites/1 | jq . # returns a single satellite with given id
+```
+
+## Architecture Decisions
+
+### C#/.NET
+
+### Entity Framework (EF)
+
+### Dependency Injection (DI)
+
 ## Development
 
 ### System Requirements
