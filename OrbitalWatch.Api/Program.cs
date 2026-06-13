@@ -15,6 +15,8 @@ builder.Services.AddDbContext<OrbitalWatchDbContext>(options =>
 
 builder.Services.AddScoped<ISatelliteRepository, SatelliteRepository>(); // AddScoped creates one instance per HTTP request, which is required instead of AddSingleton as EF is not thread safe
 
+builder.Services.AddHostedService<SeedService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
