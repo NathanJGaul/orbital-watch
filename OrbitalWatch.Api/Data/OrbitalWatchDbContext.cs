@@ -5,7 +5,7 @@ namespace OrbitalWatch.Api.Data;
 
 public class OrbitalWatchDbContext(DbContextOptions<OrbitalWatchDbContext> options) : DbContext(options)
 {
-  public DbSet<Satellite> Satellites => Set<Satellite>();
+  public DbSet<Satellite> Satellites => Set<Satellite>(); // Set<T>() is null safe compared to { get; set; } (idomatic .NET 10)
   public DbSet<TelemetryEvent> TelemetryEvents => Set<TelemetryEvent>();
   public DbSet<ConjunctionAlert> ConjunctionAlerts => Set<ConjunctionAlert>();
   public DbSet<Maneuver> Maneuvers => Set<Maneuver>();
@@ -23,7 +23,7 @@ public class OrbitalWatchDbContext(DbContextOptions<OrbitalWatchDbContext> optio
     modelBuilder.Entity<TelemetryEvent>(e =>
       {
         e.HasIndex(t => new { t.SatelliteId, t.Timestamp }); // most queries filter by satellite id and time interval of event
-        e.HasIndex(t => t.Timestamp); // global time internval queries
+        e.HasIndex(t => t.Timestamp); // global time interval queries
 
         e.HasOne(t => t.Satellite)
           .WithMany(s => s.TelemetryEvents)
@@ -40,7 +40,7 @@ public class OrbitalWatchDbContext(DbContextOptions<OrbitalWatchDbContext> optio
         e.HasOne(c => c.PrimarySatellite)
           .WithMany()
           .HasForeignKey(c => c.PrimarySatelliteId)
-          .OnDelete(DeleteBehavior.Restrict);
+          .OnDelete(DeleteBehavior.Restrict); // do not delete the conjunction event if satellite is deleted for audit trail
 
         e.HasOne(c => c.SecondarySatellite)
           .WithMany()
