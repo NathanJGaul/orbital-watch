@@ -7,12 +7,12 @@ public class ConjunctionAlert
   public int SecondarySatelliteId { get; set; }
 
   public DateTime DetectedAt { get; set; }
-  public DateTime? TimeOfClosestApproach { get; set; }
+  public DateTime? TimeOfClosestApproach { get; set; }      // nullable: might not be computed yet
 
   public double MissDistanceKm { get; set; }
-  public double CollisionProbability { get; set; }
+  public double CollisionProbability { get; set; }          // 0.0 - 1.0
 
-  public string Severity { get; set; } = "Low";
+  public string Severity { get; set; } = "Low";             // Low | Medium | High | Critical
   public bool IsResolved { get; set; } = false;
 
   public Satellite PrimarySatellite { get; set; } = null!;
