@@ -27,6 +27,12 @@ curl http://localhost:5164/api/satellites/1 | jq . # returns a single satellite 
 
 ### C#/.NET
 
+### SQLite / SQL Server
+
+SQLite in development for quick, no setup, file-based database.
+
+SQL Server in production for its temporal tables for TelemetryEvents and columnstore indexes for analytics queries on telemetry history.
+
 ### Entity Framework (EF)
 
 ### Dependency Injection (DI)
