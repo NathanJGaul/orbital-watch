@@ -18,5 +18,5 @@ public class TelemetryEvent
 
   public double SpeedKms { get; set; } // pre-computed for quick queries
 
-  public Satellite Satellite { get; set; } = null;
+  public Satellite Satellite { get; set; } = null!;
 }
