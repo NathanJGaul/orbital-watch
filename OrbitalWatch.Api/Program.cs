@@ -25,6 +25,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddScoped<ISatelliteRepository, SatelliteRepository>(); // AddScoped creates one instance per HTTP request, which is required instead of AddSingleton as EF is not thread safe
 builder.Services.AddScoped<ITelemetryRepository, TelemetryRepository>();
 
+builder.Services.AddScoped<CurrentStateService>();
+
 builder.Services.AddHostedService<SeedService>();
 
 builder.Services.AddHostedService<TelemetrySimulatorService>();
