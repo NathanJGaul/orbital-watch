@@ -1,14 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using OrbitalWatch.Api.Data;
 using OrbitalWatch.Api.Models;
+using StackExchange.Redis;
 
 namespace OrbitalWatch.Api.Services;
 
 
-public class TelemetrySimulatorService : BackgroundService
+public class TelemetrySimulatorService(
+  IServiceProvider services,
+  IConnectionMultiplexer mux,
+  ILogger<TelemetrySimulatorService> logger)
+  : BackgroundService
 {
-  private readonly IServiceProvider _services;
-  private readonly ILogger<TelemetrySimulatorService> _logger;
   private readonly TimeSpan _interval = TimeSpan.FromSeconds(2);
 
   private const double R = 6371.0; // Earth radius in km
@@ -25,14 +28,6 @@ public class TelemetrySimulatorService : BackgroundService
 
   private readonly Dictionary<int, OrbitalParams> _orbits = new();
 
-  public TelemetrySimulatorService(
-    IServiceProvider services,
-    ILogger<TelemetrySimulatorService> logger)
-  {
-    _services = services;
-    _logger = logger;
-  }
-
   protected override async Task ExecuteAsync(CancellationToken ct)
   {
     // Wait for the app to finish starting before we begin ticking
@@ -40,7 +35,7 @@ public class TelemetrySimulatorService : BackgroundService
 
     await InitializeOrbitsAsync(ct);
 
-    _logger.LogInformation(
+    logger.LogInformation(
       "TelemetrySimulatorService started. Ticking every {Interval}s for {Count} satellites.",
       _interval.TotalSeconds, _orbits.Count
     );
@@ -61,7 +56,7 @@ public class TelemetrySimulatorService : BackgroundService
 
   private async Task InitializeOrbitsAsync(CancellationToken ct)
   {
-    using var scope = _services.CreateScope();
+    using var scope = services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<OrbitalWatchDbContext>();
 
     var satellites = await db.Satellites
@@ -92,16 +87,17 @@ public class TelemetrySimulatorService : BackgroundService
       );
     }
 
-    _logger.LogInformation("Initialized orbital parameters for {Count} satellites.", _orbits.Count);
+    logger.LogInformation("Initialized orbital parameters for {Count} satellites.", _orbits.Count);
   }
 
   private async Task TickAsync(DateTime now, CancellationToken ct)
   {
-    using var scope = _services.CreateScope();
+    using var scope = services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<OrbitalWatchDbContext>();
+    var cache = scope.ServiceProvider.GetRequiredService<CurrentStateService>();
 
     double tSeconds = (now - DateTime.UnixEpoch).TotalSeconds;
-
+    var pub = mux.GetSubscriber();
     var events = new List<TelemetryEvent>();
 
     foreach (var (satId, orbit) in _orbits)
@@ -124,8 +120,25 @@ public class TelemetrySimulatorService : BackgroundService
 
     db.TelemetryEvents.AddRange(events);
     await db.SaveChangesAsync(ct);
+    
+    // Publish each event to Redis and update the cache
+    foreach (var evt in events)
+    {
+      var json = System.Text.Json.JsonSerializer.Serialize(evt);
+      var channel = $"orbital:telemetry:{evt.SatelliteId}";
 
-    _logger.LogDebug("Tick: wrote {Count} telemetry events at {TimeStamp}.", events.Count, now);
+      try
+      {
+        await pub.PublishAsync(RedisChannel.Literal(channel), json);
+        await cache.SetAsync(evt);
+      }
+      catch (RedisException e)
+      {
+        logger.LogError(e, "Redis unavailable on publish for satellite {id}. Skipping cache.", evt.SatelliteId);
+      }
+    }
+
+    logger.LogDebug("Tick: wrote {Count} telemetry events at {TimeStamp}.", events.Count, now);
 
   }
 
