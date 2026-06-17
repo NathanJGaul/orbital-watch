@@ -32,3 +32,4 @@ TestResults/
 
 # SQLite DB
 *.db
+*.db-*
