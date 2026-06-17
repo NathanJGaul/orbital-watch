@@ -8,6 +8,7 @@ using Moq;
 using OrbitalWatch.Api.Data;
 using OrbitalWatch.Api.Hubs;
 using OrbitalWatch.Api.Models;
+using OrbitalWatch.Api.Services;
 using StackExchange.Redis;
 
 namespace OrbitalWatch.Api.Tests.IntegrationTests;
@@ -19,8 +20,9 @@ public class TelemetryHubTests(TelemetryHubTestFixture fixture)
     public async Task Negotiate_ReturnsConnectionIdAndTransports()
     {
         var client = fixture.Factory.CreateClient();
+        var token = GenerateTestToken();
 
-        var response = await client.PostAsync("/hubs/telemetry/negotiate", null);
+        var response = await client.PostAsync($"/hubs/telemetry/negotiate?access_token={token}", null);
         response.EnsureSuccessStatusCode();
 
         var body = await response.Content.ReadAsStringAsync();
@@ -305,10 +307,22 @@ public class TelemetryHubTests(TelemetryHubTestFixture fixture)
     private HubConnection CreateConnection()
     {
         var server = fixture.Factory.Server;
+        var token = GenerateTestToken();
         return new HubConnectionBuilder()
             .WithUrl("http://localhost/hubs/telemetry",
-                o => { o.HttpMessageHandlerFactory = _ => server.CreateHandler(); })
+                o =>
+                {
+                    o.HttpMessageHandlerFactory = _ => server.CreateHandler();
+                    o.AccessTokenProvider = () => Task.FromResult(token)!;
+                })
             .Build();
+    }
+
+    private string GenerateTestToken()
+    {
+        using var scope = fixture.Factory.Services.CreateScope();
+        var tokenService = scope.ServiceProvider.GetRequiredService<TokenService>();
+        return tokenService.GenerateToken("test-user");
     }
 
     private static TelemetryEvent MakeEvent(int satelliteId, int id) => new()
@@ -346,6 +360,11 @@ public class TelemetryHubTestFixture : IAsyncLifetime
             .WithWebHostBuilder(builder =>
             {
                 builder.UseSetting("Environment", "Development");
+
+                builder.UseSetting("Jwt:Key", "orbital-watch-dev-secret-key-change-in-production-min-32-chars");
+                builder.UseSetting("Jwt:Issuer", "orbital-watch-api");
+                builder.UseSetting("Jwt:Audience", "orbital-watch-client");
+                builder.UseSetting("Jwt:ExpiryMinutes", "60");
 
                 builder.ConfigureServices(services =>
                 {
