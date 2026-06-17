@@ -22,13 +22,18 @@ public class CurrentStateService(IConnectionMultiplexer mux, ILogger<CurrentStat
             if (cached.HasValue)
             {
                 logger.LogDebug("Cache HIT for satellite {Id}.", satelliteId);
-                return JsonSerializer.Deserialize<TelemetryEvent>(cached!.ToString());                
+                return JsonSerializer.Deserialize<TelemetryEvent>(cached!.ToString());
             }
         }
         catch (RedisException e)
-        {   
+        {
             // Redis is unavailable
-            logger.LogWarning(e, "Redis unavailble on GET for satellite {id}, Falling through to DB.", satelliteId);
+            logger.LogWarning(e, "Redis unavailable on GET for satellite {id}, Falling through to DB.", satelliteId);
+        }
+        catch (JsonException e)
+        {
+            logger.LogWarning(e,
+                "Failed to deserialize cached telemetry event for satellite {id}. Falling through to DB.", satelliteId);
         }
 
         return null; // cache miss - caller handles DB fallback
@@ -46,7 +51,8 @@ public class CurrentStateService(IConnectionMultiplexer mux, ILogger<CurrentStat
         }
         catch (RedisException e)
         {
-            logger.LogWarning(e, "Redis unavailable on SET for satellite {id}. Skipping cache.", telemetryEvent.SatelliteId);
+            logger.LogWarning(e, "Redis unavailable on SET for satellite {id}. Skipping cache.",
+                telemetryEvent.SatelliteId);
         }
     }
 }
