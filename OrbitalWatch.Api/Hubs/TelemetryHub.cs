@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace OrbitalWatch.Api.Hubs;
 
+[Authorize]
 public class TelemetryHub(ILogger<TelemetryHub> logger) : Hub
 {
     /// <summary>
