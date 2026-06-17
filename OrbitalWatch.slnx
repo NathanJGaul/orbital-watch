@@ -1,4 +1,5 @@
 <Solution>
   <Folder Name="/Solution Items/" />
   <Project Path="OrbitalWatch.Api/OrbitalWatch.Api.csproj" />
+  <Project Path="OrbitalWatch.Api.Tests/OrbitalWatch.Api.Tests.csproj"/>
 </Solution>
