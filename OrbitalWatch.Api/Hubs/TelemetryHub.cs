@@ -48,5 +48,5 @@ public class TelemetryHub(ILogger<TelemetryHub> logger) : Hub
     }
 
     // Shared helper used for both the hub and the Redis bridge
-    private static string GroupName(int satelliteId) => $"sat-{satelliteId}";
+    public static string GroupName(int satelliteId) => $"sat-{satelliteId}";
 }
