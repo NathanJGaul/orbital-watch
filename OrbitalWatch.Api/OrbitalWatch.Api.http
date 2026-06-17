@@ -1,6 +1,22 @@
-@OrbitalWatch.Api_HostAddress = http://localhost:5164
+// Check that Telemetry api is functioning (with default page length of 20)
+GET {{host}}:{{port}}/api/satellites/1/telemetry
 
-GET {{OrbitalWatch.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+> {%
+    client.test("Telemetry array length check", function () {
+        client.assert(response.body.length === 20, "Expected length 20, got " + response.body.length);
+    });
+%}
 
 ###
+
+// Check for latest Telemetry api function
+GET {{host}}:{{port}}/api/satellites/1/telemetry/latest
+
+> {%
+    client.log("Latest telemetry latitude: " + response.body.latitudeDeg)
+%}
+
+###
+
+// Check the Telemetry hub
+POST {{host}}:{{port}}/hubs/telemetry/negotiate
