@@ -9,6 +9,7 @@ namespace OrbitalWatch.Api.Controllers;
 /// </summary>
 /// <param name="tokenService"></param>
 [ApiController]
+[Route("api/[controller]")]
 [EnableRateLimiting("auth")]
 public class AuthController(TokenService tokenService) : ControllerBase
 {

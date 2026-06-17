@@ -23,8 +23,8 @@ public class AuditMiddleware(RequestDelegate next, ILogger<AuditMiddleware> logg
 
             logger.LogInformation("[AUDIT] {Method} {Path} | User: {user} | IP: {Ip} | Time: {Time:u}", method, path,
                 user, ip, DateTime.UtcNow);
-
-            await next(context);
         }
+
+        await next(context);
     }
 }
