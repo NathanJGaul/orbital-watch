@@ -127,4 +127,17 @@ export default defineConfig({
     },
   },
   plugins: lazyPlugins(() => [react()]),
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://localhost:5164',
+        changeOrigin: true,
+      },
+      '/hubs': {
+        target: 'https://localhost:5164',
+        changeOrigin: true,
+        ws: true,
+      }
+    }
+  }
 });
