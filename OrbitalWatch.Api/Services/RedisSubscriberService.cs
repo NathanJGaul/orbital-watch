@@ -87,6 +87,7 @@ public class RedisSubscriberService(
         foreach (var other in snapshot)
         {
             if (other.SatelliteId == updated.SatelliteId) continue;
+            if (updated.SatelliteId > other.SatelliteId) continue; // Prevent duplicate conjunction alerts
             var distKm = Distance3DKm(updated, other);
             if (distKm < ConjunctionThresholdKm)
             {
