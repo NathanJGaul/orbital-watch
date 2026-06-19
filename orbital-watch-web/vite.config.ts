@@ -130,11 +130,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:5164',
+        target: 'http://localhost:5164',
         changeOrigin: true,
       },
       '/hubs': {
-        target: 'https://localhost:5164',
+        target: 'http://localhost:5164',
         changeOrigin: true,
         ws: true,
       }
