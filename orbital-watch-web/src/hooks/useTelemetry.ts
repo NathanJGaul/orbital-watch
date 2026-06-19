@@ -74,5 +74,5 @@ export function useTelemetry(satelliteIds: number[]) {
       connection.stop();
       connectionRef.current = null;
     };
-  }, []);
+  }, [satelliteIds]);
 }

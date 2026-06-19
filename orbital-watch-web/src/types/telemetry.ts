@@ -7,11 +7,11 @@ export interface Satellite {
     isActive: boolean
 }
 
-export interface Telemetry {
+export interface TelemetryEvent {
     id: number
     satelliteId: number
-    timestampt: string      // ISO 8601 from .NET DateTime
-    altitudeDeg: number
+    timestamp: string      // ISO 8601 from .NET DateTime
+    altitudeKm: number
     longitudeDeg: number
     latitudeDeg: number
     velocityXKms: number
@@ -25,7 +25,7 @@ export interface ConjunctionAlert {
     secondarySatelliteId: number
     missDistanceKm: number
     detectedAt: string
-    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+    severity: 'Low' | 'Medium' | 'High' | 'Critical'
 }
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting'

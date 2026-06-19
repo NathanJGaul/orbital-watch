@@ -4,7 +4,7 @@ import type {
   TelemetryEvent,
   ConjunctionAlert,
   ConnectionStatus,
-} from "../types";
+} from "../types/telemetry";
 
 interface TelemetryState {
   // Static catalog data, fetched once on load
