@@ -1,0 +1,114 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.login-gate, .dashboard {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.login-gate input {
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.login-gate button, .dashboard button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.status-pill {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.status-connected    { background: #166534; }
+.status-connecting   { background: #854d0e; }
+.status-reconnecting { background: #854d0e; }
+.status-disconnected { background: #7f1d1d; }
+
+.satellite-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.satellite-table th, .satellite-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+.satellite-table th {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.row-alert {
+  background: rgba(220, 38, 38, 0.15);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { background: rgba(220, 38, 38, 0.1); }
+  50%      { background: rgba(220, 38, 38, 0.25); }
+}
+
+.regime-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.alert-banner-container {
+  margin-bottom: 1rem;
+}
+
+.alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 6px;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.alert-banner button {
+  background: transparent;
+  border: none;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.error {
+  color: #f87171;
+}
