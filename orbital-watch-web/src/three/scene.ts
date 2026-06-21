@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const EARTH_RADIUS = 5;
+const SCENE_EARTH_RADIUS = 5;
 
 export interface GlobeScene {
   scene: THREE.Scene;
@@ -41,7 +41,7 @@ export function createGlobalScene(canvas: HTMLCanvasElement): GlobalScene {
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load("/textures/earth_daymap.jpg");
 
-  const earthGeometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+  const earthGeometry = new THREE.SphereGeometry(SCENE_EARTH_RADIUS, 64, 64);
   const earthMaterial = new THREE.MeshStandardMaterial({
     map: earthTexture,
     roughness: 0.8,
@@ -77,4 +77,4 @@ export function createGlobalScene(canvas: HTMLCanvasElement): GlobalScene {
   return { scene, camera, renderer, controls, earth, dispose };
 }
 
-export { EARTH_RADIUS };
+export { SCENE_EARTH_RADIUS };
