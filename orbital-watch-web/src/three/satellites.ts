@@ -24,6 +24,7 @@ interface SatelliteMesh {
 export class SatelliteLayer {
   private group: THREE.Group;
   private satellites: Map<number, SatelliteMesh> = new Map();
+  private conjunctionLines: THREE.Line[] = [];
 
   constructor(scene: THREE.Scene) {
     this.group = new THREE.Group();
@@ -107,6 +108,44 @@ export class SatelliteLayer {
         sat.mesh.scale.setScalar(sat.baseScale);
       }
     }
+  }
+
+  // Draw a temporary line between two satellites, removed after 'durationMs'
+  showConjunctionLine(satelliteIdA: number, satelliteIdB: number, durationMs = 4) {
+    const a = this.satellites.get(satelliteIdA);
+    const b = this.satellites.get(satelliteIdB);
+    if (!a || !b) return;
+
+    const positions = new Float32Array([
+      a.mesh.position.x,
+      a.mesh.position.y,
+      a.mesh.position.z,
+      b.mesh.position.x,
+      b.mesh.position.y,
+      b.mesh.position.z,
+    ]);
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.LineBasicMaterial({
+      color: 0xff3333,
+      linewidth: 2,
+    });
+
+    const line = new THREE.Line(geometry, material);
+    this.group.add(line);
+    this.conjunctionLines.push(line);
+
+    this.pulse(satelliteIdA);
+    this.pulse(satelliteIdB);
+
+    setTimeout(() => {
+      this.group.remove(line);
+      geometry.dispose();
+      material.dispose();
+      this.conjunctionLines = this.conjunctionLines.filter((l) => l !== line);
+    }, durationMs);
   }
 
   dispose() {
