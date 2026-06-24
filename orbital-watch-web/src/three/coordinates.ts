@@ -21,7 +21,7 @@ export function latLonAltToVector3(latDeg: number, lonDeg: number, altKm: number
 
   // Scale factor: scene units per real km
   const scale = SCENE_EARTH_RADIUS / REAL_EARTH_RADIUS_KM;
-  const r = REAL_EARTH_RADIUS_KM * altKm * scale;
+  const r = (REAL_EARTH_RADIUS_KM + altKm) * scale;
 
   // Standard spherical-to-Cartesian conversion.
   // Three.js uses a Y-up coordinate system, so latitude maps to Y (not Z).

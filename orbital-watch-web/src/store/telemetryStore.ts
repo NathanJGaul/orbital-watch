@@ -9,7 +9,7 @@ import type {
 interface TelemetryState {
   // Static catalog data, fetched once on load
   satellites: Satellite[];
-  satSatellites: (satellites: Satellite[]) => void;
+  setSatellites: (satellites: Satellite[]) => void;
 
   // Live telemetry data, keyed by satellite ID - updated on every SignalR message
   latestTelemetry: Record<number, TelemetryEvent>; // O(1) lookup compared to O(n) array lookup

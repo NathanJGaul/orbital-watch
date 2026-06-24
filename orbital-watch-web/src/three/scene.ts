@@ -11,7 +11,7 @@ export interface GlobeScene {
   dispose: () => void;
 }
 
-export function createGlobalScene(canvas: HTMLCanvasElement): GlobalScene {
+export function createGlobeScene(canvas: HTMLCanvasElement): GlobeScene {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0a0a0e1a);
 
