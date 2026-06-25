@@ -8,6 +8,7 @@ export interface GlobeScene {
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   controls: OrbitControls;
+  earth: THREE.Mesh;
   dispose: () => void;
 }
 
