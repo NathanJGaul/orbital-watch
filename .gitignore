@@ -33,3 +33,4 @@ TestResults/
 # SQLite DB
 *.db
 *.db-*
+orbital-watch-web/.zed/debug.json

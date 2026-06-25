@@ -1,11 +1,59 @@
 services:
+  # ---------------------------------------------------------------
+  # REDIS - In-memory cache / message broker (satellite data cache)
+  # ---------------------------------------------------------------
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine            # Use Redis 7 on Alpine Linux (lightweight)
     ports:
-      - "6379:6379"
-    command: redis-server --loglevel warning
+      - "6379:6379"                  # Expose default Redis port to host
+    command: redis-server --loglevel warning  # Start Redis, only log warnings+
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "redis-cli", "ping"]     # Check Redis is alive via PING
+      interval: 5s                            # Check every 5 seconds
+      timeout: 3s                             # Each check times out in 3s
+      retries: 5                              # Mark unhealthy after 5 failures
+  
+  # ---------------------------------------------------------------
+  # API - .NET backend (satellite tracking, auth, CelesTrak proxy)
+  # ---------------------------------------------------------------
+  api:
+    build:
+      context: ./OrbitalWatch.Api    # Build context = .NET project root
+      dockerfile: Dockerfile         # Dockerfile inside that directory
+    ports:
+      - "8080:8080"                  # Map host 8080 -> container 8080
+    environment:
+      - ConnectionStrings__Redis=redis:6379       # Redis connection string
+      - ConnectionStrings__Default=Data Source =/data/orbital_watch.db  # SQLite path
+      - Jwt__Key=${JWT_KEY:-orbital-watch-dev-secret-key-change-in-production-min-32-chars}  # JWT signing key (override via $JWT_KEY)
+      - Jwt__Issuer=orbital-watch-api             # JWT token issuer
+      - Jwt__Audience=orbital-watch-client        # JWT intended audience
+      - Jwt__ExpiryMinutes=60                     # Token lifetime in minutes
+      - ASPNETCORE_ENVIRONMENT=Production         # Run in production mode
+    volumes:
+      - orbital_watch_db:/data       # Persist SQLite DB in named volume
+    depends_on:
+      redis:
+        condition: service_healthy   # Wait for Redis healthcheck to pass
+    healthcheck:
+      test: ["CMD", "httpcheck", "http://localhost:8080/api/satellites"]  # Probe API via httpcheck (https://github.com/tarampampam/microcheck)
+      interval: 10s                  # Check every 10 seconds
+      timeout: 5s                    # Each check times out in 5s
+      retries: 5                     # Mark unhealthy after 5 failures
+      start_period: 15s              # Give the app 15s to boot before checks
+  
+  # ---------------------------------------------------------------
+  # FRONTEND - Next.js / Remotion web client (UI + video rendering)
+  # ---------------------------------------------------------------
+  frontend:
+    build:
+      context: ./orbital-watch-web   # Build context = web project root
+      dockerfile: Dockerfile         # Dockerfile inside that directory
+    ports:
+      - "3001:80"                    # Map host 3001 -> container port 80 (nginx)
+    depends_on:
+      api:
+        condition: service_healthy   # Wait for API healthcheck to pass
+
+volumes:
+  orbital_watch_db:                  # Named volume for SQLite database persistence
