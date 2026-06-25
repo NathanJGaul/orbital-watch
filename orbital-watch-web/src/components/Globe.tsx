@@ -6,6 +6,7 @@ import { useTelemetryStore } from "../store/telemetryStore";
 export function Globe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const layerRef = useRef<SatelliteLayer>(null);
+  const lastAlertCount = useRef(0);
 
   const satellites = useTelemetryStore((s) => s.satellites);
   const latestTelemetry = useTelemetryStore((s) => s.latestTelemetry);
@@ -54,10 +55,17 @@ export function Globe() {
   // Draw conjunction lines when alerts fires
   useEffect(() => {
     if (!layerRef.current) return;
-    for (const alert of alerts) {
-      layerRef.current.showConjunctionLine(alert.primarySatelliteId, alert.secondarySatelliteId);
+    // If alerts were cleared, reset and skip
+    if (alerts.length < lastAlertCount.current) {
+      lastAlertCount.current = 0;
+      return;
     }
-  }, [alerts.length]);
+    // Only process new alerts since last run
+    for (let i = lastAlertCount.current; i < alerts.length; i++) {
+      layerRef.current.showConjunctionLine(alerts[i].primarySatelliteId, alerts[i].secondarySatelliteId);
+    }
+    lastAlertCount.current = alerts.length;
+  }, [alerts]);
 
   return <canvas ref={canvasRef} className="globe-canvas" />;
 }

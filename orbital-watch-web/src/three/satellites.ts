@@ -25,6 +25,7 @@ export class SatelliteLayer {
   private group: THREE.Group;
   private satellites: Map<number, SatelliteMesh> = new Map();
   private conjunctionLines: THREE.Line[] = [];
+  private conjunctionTimeouts: Set<ReturnType<typeof setTimeout>> = new Set();
 
   constructor(scene: THREE.Scene) {
     this.group = new THREE.Group();
@@ -111,7 +112,7 @@ export class SatelliteLayer {
   }
 
   // Draw a temporary line between two satellites, removed after 'durationMs'
-  showConjunctionLine(satelliteIdA: number, satelliteIdB: number, durationMs = 4) {
+  showConjunctionLine(satelliteIdA: number, satelliteIdB: number, durationMs = 4000) {
     const a = this.satellites.get(satelliteIdA);
     const b = this.satellites.get(satelliteIdB);
     if (!a || !b) return;
@@ -140,15 +141,29 @@ export class SatelliteLayer {
     this.pulse(satelliteIdA);
     this.pulse(satelliteIdB);
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
+      this.conjunctionTimeouts.delete(timeoutId);
       this.group.remove(line);
       geometry.dispose();
       material.dispose();
       this.conjunctionLines = this.conjunctionLines.filter((l) => l !== line);
     }, durationMs);
+    this.conjunctionTimeouts.add(timeoutId);
   }
 
   dispose() {
+    for (const timeoutId of this.conjunctionTimeouts) {
+      clearTimeout(timeoutId);
+    }
+    this.conjunctionTimeouts.clear();
+
+    for (const line of this.conjunctionLines) {
+      this.group.remove(line);
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    }
+    this.conjunctionLines = [];
+
     for (const sat of this.satellites.values()) {
       sat.mesh.geometry.dispose();
       (sat.mesh.material as THREE.Material).dispose();

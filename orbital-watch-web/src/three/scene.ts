@@ -14,7 +14,7 @@ export interface GlobeScene {
 
 export function createGlobeScene(canvas: HTMLCanvasElement): GlobeScene {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a0e1a);
+  scene.background = new THREE.Color(0x0a0a0e);
 
   // Camera: field of view 45 deg, aspect ratio from canvas, near/far clipping planes
   const camera = new THREE.PerspectiveCamera(
@@ -23,7 +23,7 @@ export function createGlobeScene(canvas: HTMLCanvasElement): GlobeScene {
     0.1,
     1000,
   );
-  camera.position.set(0, 0, 1);
+  camera.position.set(0, 0, 15);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);

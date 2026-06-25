@@ -50,7 +50,7 @@ services:
       context: ./orbital-watch-web   # Build context = web project root
       dockerfile: Dockerfile         # Dockerfile inside that directory
     ports:
-      - "3001:80"                    # Map host 3000 -> container port 80 (nginx)
+      - "3001:80"                    # Map host 3001 -> container port 80 (nginx)
     depends_on:
       api:
         condition: service_healthy   # Wait for API healthcheck to pass
